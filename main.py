@@ -5,25 +5,19 @@ import folium
 
 pd.set_option('display.max_columns', 60)
 
-acnc = pd.read_excel('data/datadotgov_main.xlsx', keep_default_na=False)
+df = pd.read_excel('C:\\Dev\\parsing\\data\\2021.xlsx', keep_default_na=False)
 
-mel = acnc[acnc.Town_City.str.contains('melbourne', case=False)][
-    [
-        'ABN',
-        'Charity_Legal_Name',
-        'Address_Line_1',
-        'Address_Line_2',
-        'Address_Line_3',
-        'Town_City',
-        'State',
-        'Postcode',
-        'Country',
-        'Date_Organisation_Established',
-        'Charity_Size',
-    ]
-].copy()
+Url_With_Coordinate = []
 
-mel.Town_City.value_counts()
-mel.head()
+option = webdriver.ChromeOptions()
+prefs = {'profile.default_content_setting_values': {'images': 2, 'javascript': 2}}
+option.add_experimental_option('prefs', prefs)
 
-mel['Full_Address'] = mel['Address_Line_1'].str.cat(mel[['Address_Line_2', 'Address_Line_3', 'Town_City']], sep=' ')
+
+driver = webdriver.Chrome('C:\\Dev\\parsing\\chromedriver.exe')
+
+for url in tqdmn(df['Url'], leave=False):
+    driver.get(url)
+    Url_With_Coordinate.append(driver.find_element_by_css_selector('meta[itemprop=image]').get_attribute('content'))
+
+driver.close()
